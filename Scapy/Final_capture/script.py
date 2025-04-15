@@ -2,11 +2,11 @@ from scapy.all import sniff, IP, wrpcap
 from collections import Counter
 import time
 import os
+
 THRESHOLD = 20
 INTERVAL_RESET = 60
 ip_counter = Counter()
 last_reset = time.time()
-
 
 timestamp = time.strftime('%Y-%m-%d %H:%M:%S')
 
@@ -33,7 +33,6 @@ def packet_callback(packet):
             wrpcap(f"{timestamp}/suspicious_traffic_{src_ip}.pcap", packet, append=True)
 
 
-# Démarrage de la capture
 print("[+] Démarrage de la surveillance réseau...")
 print(f"[+] Seuil d'alerte: {THRESHOLD} paquets")
 print(f"[+] Intervalle de reset: {INTERVAL_RESET} secondes")
