@@ -9,7 +9,6 @@ import csv
 import os
 import signal
 from pcap2csv import PcapToCsvConverter
-from pcap2csv2 import pcap2csv
 
 synflood_enabled = True
 port_scan_enabled = True
@@ -60,6 +59,7 @@ def keyboard_listener():
                 converter.convert()
                 #pcap2csv(output_file + "_all.pcap", output_file + "_all.csv")
                 #pcap2csv(output_file + "_malicious.pcap", output_file + "_malicious.csv")
+                time.sleep(2)
                 print("Quitter...")
                 os._exit(0)
                 
@@ -127,15 +127,22 @@ def stop_filter(packet):
     return not sniff_enabled
 
 def capture(out_file, interface=None):
-    global data, output_file, sniff
+    global data, output_file, sniff_enabled
     output_file = out_file
     t = threading.Thread(target=keyboard_listener, daemon=True)
     t.start()
     if interface is None:
-        data = sniff(prn=packet_callback, stop_filter=stop_filter)
+        sniff(prn=packet_callback, stop_filter=stop_filter)
     else:
-        data = sniff(prn=packet_callback, iface=interface, stop_filter=stop_filter)
+        sniff(prn=packet_callback, iface=interface, stop_filter=stop_filter)
     
+    # Ajouter la sauvegarde ici aussi
+    wrpcap(output_file + "_all.pcap", data)
+    wrpcap(output_file + "_malicious.pcap", malicious_data)
+    converter = PcapToCsvConverter(output_file + "_all.pcap", output_file + "_all.csv")
+    converter.convert()
+    converter = PcapToCsvConverter(output_file + "_malicious.pcap", output_file + "_malicious.csv")
+    converter.convert() 
 
 
 
